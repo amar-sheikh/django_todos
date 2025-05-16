@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 from django.db.utils import IntegrityError
 from django.contrib import admin
 from .models import Todo
@@ -122,3 +123,156 @@ class TestTodoAdmin(TestCase):
     
     def test_search_fields(self):
         self.assertEqual(self.todo_admin.search_fields, ('task_name', 'task_description'))
+
+class TestTodoListViews(TestCase):
+    def setUp(self):
+        self.todo1 = Todo.objects.create(
+            task_name='Task 1',
+            task_description='Task 1 description',
+            is_completed=False
+        )
+        self.todo2 = Todo.objects.create(
+            task_name='Task 2',
+            task_description='Task 2 description',
+            is_completed=True
+        )
+
+    def test_todo_list_view(self):
+        response = self.client.get(reverse('todo_list'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.todo1)
+        self.assertContains(response, self.todo2)
+
+class TestTodoCreateViews(TestCase):
+    def setUp(self):
+        self.todo1 = Todo.objects.create(
+            task_name='Task 1',
+            task_description='Task 1 description',
+            is_completed=False
+        )
+
+    def test_get_create_view(self):
+        response = self.client.get(reverse('todo_create'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_todo_create_view(self):
+        data = {
+            "task_name": 'Task 2',
+            "task_description": 'Task 2 description',
+            "is_completed": True
+        }
+        self.assertEqual(Todo.objects.count(), 1)
+
+        response = self.client.post(reverse('todo_create'), data)
+
+        self.assertEqual(Todo.objects.count(), 2)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('todo_list'))
+        last_todo = Todo.objects.last()
+        self.assertEqual(last_todo.task_name, 'Task 2')
+        self.assertEqual(last_todo.task_description, 'Task 2 description')
+        self.assertTrue(last_todo.is_completed)
+
+    def test_post_todo_create_view_with_invalid_data(self):
+        data = {
+            "task_name": 'Task 1',
+            "task_description": 'Task 2 description',
+            "is_completed": True
+        }
+        self.assertEqual(Todo.objects.count(), 1)
+
+        response = self.client.post(reverse('todo_create'), data)
+
+        self.assertEqual(Todo.objects.count(), 1)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Todo with this Task name already exists.', response.context['form'].errors['task_name'])
+
+class TestTodoUpdateView(TestCase):
+    def setUp(self):
+        self.todo = Todo.objects.create(
+            task_name='Task name',
+            task_description='Task description',
+            is_completed=True
+        )
+
+    def test_get_todo_update_view(self):
+        response = self.client.get(reverse('todo_edit', args=[self.todo.id]))
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_todo_update_view_with_invalid_id(self):
+        response = self.client.get(reverse('todo_edit', args=[self.todo.id + 1]))
+        self.assertEqual(response.status_code, 404)
+
+    def test_post_todo_update_view(self):
+        data = {
+            "task_name": 'New task name',
+            "task_description": 'New task description',
+            "is_completed": False
+        }
+
+        self.assertEqual(self.todo.task_name, 'Task name')
+        self.assertEqual(self.todo.task_description, 'Task description')
+        self.assertTrue(self.todo.is_completed)
+
+        response = self.client.post(reverse('todo_edit', args=[self.todo.id]), data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('todo_list'))
+        self.todo.refresh_from_db()
+        self.assertEqual(self.todo.task_name, 'New task name')
+        self.assertEqual(self.todo.task_description, 'New task description')
+        self.assertFalse(self.todo.is_completed)
+
+    def test_post_todo_update_view_with_invalid_data(self):
+        data = {
+            "task_name": '',
+            "task_description": 'New task description',
+            "is_completed": False
+        }
+
+        self.assertEqual(self.todo.task_name, 'Task name')
+        self.assertEqual(self.todo.task_description, 'Task description')
+        self.assertTrue(self.todo.is_completed)
+
+        response = self.client.post(reverse('todo_edit', args=[self.todo.id]), data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('This field is required.', response.context['form'].errors['task_name'])
+        self.todo.refresh_from_db()
+        self.assertEqual(self.todo.task_name, 'Task name')
+        self.assertEqual(self.todo.task_description, 'Task description')
+        self.assertTrue(self.todo.is_completed)
+
+class TestTodoDeleteView(TestCase):
+    def setUp(self):
+        self.todo = Todo.objects.create(
+            task_name='Task name',
+            task_description='Task description',
+            is_completed=True
+        )
+
+    def test_get_todo_delete_view(self):
+        response = self.client.get(reverse('todo_delete', args=[self.todo.id]))
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_todo_delete_view_with_invalid_id(self):
+        response = self.client.get(reverse('todo_delete', args=[self.todo.id + 1]))
+        self.assertEqual(response.status_code, 404)
+
+    def test_post_todo_delete_view(self):
+        self.assertEqual(Todo.objects.count(), 1)
+
+        response = self.client.post(reverse('todo_delete', args=[self.todo.id]))
+
+        self.assertEqual(Todo.objects.count(), 0)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('todo_list'))
+
+    def test_post_todo_delete_view_with_invalid_id(self):
+        self.assertEqual(Todo.objects.count(), 1)
+
+        response = self.client.post(reverse('todo_delete', args=[self.todo.id + 1]))
+
+        self.assertEqual(Todo.objects.count(), 1)
+        self.assertEqual(response.status_code, 404)
