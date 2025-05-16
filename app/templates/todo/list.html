@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <style>
+        .mx-10 {
+            margin: 0px 10px;
+        }
+        .item-space {
+            padding: 4px 10px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <a href="{% url 'todo_create' %}">Add Todo</a>
+    <div>
+    <hr>
+    <div>Number of Todos found: {{ todos | length }}</div>
+    <hr>
+    {% if todos %}
+        <table>
+            <thead>
+                <th class="item-space">#</th>
+                <th class="item-space">Name</th>
+                <th class="item-space">Description</th>
+                <th class="item-space">Status</th>
+                <th class="item-space">Actions<th>
+            </thead>
+            <tbody>
+                {% for todo in todos %}
+                    <tr>
+                        <td class="item-space">{{ todo.id }}</td>
+                        <td class="item-space">{{ todo.task_name }}</td>
+                        <td class="item-space">{{ todo.task_description }}</td>
+                        <td class="item-space">
+                            {% if todo.is_completed %}
+                                Complete
+                            {% else %}
+                                Not Complete
+                            {% endif %}
+                        </td>
+                        <td class="item-space">
+                            <a href="{% url 'todo_edit' todo.id %}">Edit</a>
+                            <span class="mx-10">|</span>
+                            <a href="{% url 'todo_delete' todo.pk %}">Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        No Todo found...
+    {% endif %}
+</body>
+</html>
