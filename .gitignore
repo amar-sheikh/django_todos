@@ -1,0 +1,122 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django
+*.log
+*.pot
+*.pyc
+db.sqlite3
+media/
+staticfiles/  # if you're collecting static files locally
+.env
+.env.*
+
+# VSCode and IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# macOS
+.DS_Store
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv/
+
+# Migrations (optional - keep if you're tracking them)
+# You can ignore if you want to auto-generate them in CI/CD
+# **/migrations/*.py
+# **/migrations/*.pyc
+
+# Coverage and testing
+htmlcov/
+.coverage
+.tox/
+.nox/
+.cache/
+.pytest_cache/
+coverage.xml
+nosetests.xml
+test-results/
+
+# pip tools
+pip-log.txt
+pip-delete-this-directory.txt
+
+# MyPy, Pyright, and other type checkers
+.mypy_cache/
+.dmypy.json
+.pyre/
+.pytype/
+
+# Deployment
+*.tar.gz
+*.egg-info/
+dist/
+build/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django
+*.log
+*.pot
+*.pyc
+db.sqlite3
+media/
+staticfiles/  # if you're collecting static files locally
+.env
+.env.*
+
+# VSCode and IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# macOS
+.DS_Store
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv/
+
+# Migrations (optional - keep if you're tracking them)
+# You can ignore if you want to auto-generate them in CI/CD
+# **/migrations/*.py
+# **/migrations/*.pyc
+
+# Coverage and testing
+htmlcov/
+.coverage
+.tox/
+.nox/
+.cache/
+.pytest_cache/
+coverage.xml
+nosetests.xml
+test-results/
+
+# pip tools
+pip-log.txt
+pip-delete-this-directory.txt
+
+# MyPy, Pyright, and other type checkers
+.mypy_cache/
+.dmypy.json
+.pyre/
+.pytype/
+
+# Deployment
+*.tar.gz
+*.egg-info/
+dist/
+build/
