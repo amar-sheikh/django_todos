@@ -172,6 +172,34 @@ class TestTodoListViews(TestCase):
         self.assertNotContains(response, self.not_completed_task)
         self.assertContains(response, self.completed_task)
 
+    def test_todo_list_view_with_a_search_matching_any_todo_task_name(self):
+        task_not_in_matching_search = Todo.objects.create(
+            task_name='Todo 1',
+            task_description='Task 2 description',
+            is_completed=True
+        )
+
+        response = self.client.get(reverse('todo_list'), data={'status': 'all', 'search': 'Task'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.not_completed_task)
+        self.assertContains(response, self.completed_task)
+        self.assertNotContains(response, task_not_in_matching_search)
+
+    def test_todo_list_view_with_a_search_not_matching_any_todo_task_name(self):
+        response = self.client.get(reverse('todo_list'), data={'status': 'all', 'search': 'Todo'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, self.not_completed_task)
+        self.assertNotContains(response, self.completed_task)
+
+    def test_todo_list_view_with_a_search_not_matching_in_todo_task_name_filtered_by_status(self):
+        response = self.client.get(reverse('todo_list'), data={'status': 'completed', 'search': 'task 1'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, self.not_completed_task)
+        self.assertNotContains(response, self.completed_task)
+
 class TestTodoCreateViews(TestCase):
     def setUp(self):
         self.todo1 = Todo.objects.create(
