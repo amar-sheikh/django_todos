@@ -7,6 +7,16 @@ class TodoList(ListView):
     template_name='todo/list.html'
     context_object_name='todos'
 
+    def get_queryset(self):
+        status = self.request.GET.get('status', 'completed')
+
+        if status == 'all':
+            return Todo.objects.all()
+        elif status == 'not_completed':
+            return Todo.objects.filter(is_completed=False)
+        else:
+            return Todo.objects.filter(is_completed=True)
+
 class TodoCreate(CreateView):
     model=Todo
     fields = ["task_name", "task_description", "is_completed"]
