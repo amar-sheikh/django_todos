@@ -1,4 +1,5 @@
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.http import JsonResponse
 from django.urls import reverse_lazy
 from .models import Todo
 
@@ -21,6 +22,14 @@ class TodoList(ListView):
         if search:
             queryset = queryset.filter(task_name__icontains=search)
         return queryset
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.GET.get('format') == 'json':
+            todos = list(self.get_queryset().values())
+            return JsonResponse(todos, safe=False)
+        return super().render_to_response(context, **response_kwargs)
+
+
 class TodoCreate(CreateView):
     model=Todo
     fields = ["task_name", "task_description", "is_completed"]

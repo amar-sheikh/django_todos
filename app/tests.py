@@ -200,6 +200,18 @@ class TestTodoListViews(TestCase):
         self.assertNotContains(response, self.not_completed_task)
         self.assertNotContains(response, self.completed_task)
 
+    def test_todo_list_view_with_format_json(self):
+        response = self.client.get(reverse('todo_list'), data={'format': 'json'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['content-type'], 'application/json')
+
+    def test_todo_list_view_with_non_json_format(self):
+        response = self.client.get(reverse('todo_list'), data={'format': 'html'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['content-type'], 'text/html; charset=utf-8')
+
 class TestTodoCreateViews(TestCase):
     def setUp(self):
         self.todo1 = Todo.objects.create(
