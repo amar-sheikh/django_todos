@@ -9,14 +9,18 @@ class TodoList(ListView):
 
     def get_queryset(self):
         status = self.request.GET.get('status', 'completed')
+        search = self.request.GET.get('search', '')
 
         if status == 'all':
-            return Todo.objects.all()
+            queryset = Todo.objects.all()
         elif status == 'not_completed':
-            return Todo.objects.filter(is_completed=False)
+            queryset = Todo.objects.filter(is_completed=False)
         else:
-            return Todo.objects.filter(is_completed=True)
+            queryset = Todo.objects.filter(is_completed=True)
 
+        if search:
+            queryset = queryset.filter(task_name__icontains=search)
+        return queryset
 class TodoCreate(CreateView):
     model=Todo
     fields = ["task_name", "task_description", "is_completed"]

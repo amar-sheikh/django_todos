@@ -19,6 +19,7 @@
     <div>
     <hr>
     <form action="{% url 'todo_list' %}" method="get">
+        <input type="search" name="search" placeholder="Filter the results by name">
         <select name="status">
             <option value="all">All</option>
             <option value="completed" selected>Completed</option>
