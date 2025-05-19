@@ -1,8 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/index.js' %}"></script>
     <title>Todo List</title>
     <style>
         .mx-10 {
@@ -18,20 +21,19 @@
         <a href="{% url 'todo_create' %}">Add Todo</a>
     <div>
     <hr>
-    <form action="{% url 'todo_list' %}" method="get">
-        <input type="search" name="search" placeholder="Filter the results by name" value="{{ request.GET.search }}">
-        <select name="status">
+    <form id="filterForm">
+        <input type="search" name="search" id="search" placeholder="Filter the results by name" value="{{ request.GET.search }}">
+        <select name="status" id="status">
             <option value="all" {% if request.GET.status == 'all' %} selected {% endif %}>All</option>
             <option value="completed" {% if not request.GET.status == 'all' and not request.GET.status == 'non_completed' %} selected {% endif %}>Completed</option>
             <option value="not_completed" {% if request.GET.status == 'not_completed' %} selected {% endif %}>Not Completed</option>
         </select>
-        <button type="submit">Filter results</button>
     </form>
     <hr>
-    <div>Number of Todos found: {{ todos | length }}</div>
+    <div>Number of Todos found: <span id="count">{{ todos | length }}</span></div>
     <hr>
     {% if todos %}
-        <table>
+        <table id="todo-list">
             <thead>
                 <th class="item-space">#</th>
                 <th class="item-space">Name</th>
@@ -61,8 +63,7 @@
                 {% endfor %}
             </tbody>
         </table>
-    {% else %}
-        No Todo found...
     {% endif %}
+    <p id="no-item-text" style="display: none;">No Todo found...</p>
 </body>
 </html>
