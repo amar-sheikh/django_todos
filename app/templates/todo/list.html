@@ -19,11 +19,11 @@
     <div>
     <hr>
     <form action="{% url 'todo_list' %}" method="get">
-        <input type="search" name="search" placeholder="Filter the results by name">
+        <input type="search" name="search" placeholder="Filter the results by name" value="{{ request.GET.search }}">
         <select name="status">
-            <option value="all">All</option>
-            <option value="completed" selected>Completed</option>
-            <option value="not_completed">Not Completed</option>
+            <option value="all" {% if request.GET.status == 'all' %} selected {% endif %}>All</option>
+            <option value="completed" {% if not request.GET.status == 'all' and not request.GET.status == 'non_completed' %} selected {% endif %}>Completed</option>
+            <option value="not_completed" {% if request.GET.status == 'not_completed' %} selected {% endif %}>Not Completed</option>
         </select>
         <button type="submit">Filter results</button>
     </form>
