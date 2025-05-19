@@ -18,6 +18,15 @@
         <a href="{% url 'todo_create' %}">Add Todo</a>
     <div>
     <hr>
+    <form action="{% url 'todo_list' %}" method="get">
+        <select name="status">
+            <option value="all">All</option>
+            <option value="completed" selected>Completed</option>
+            <option value="not_completed">Not Completed</option>
+        </select>
+        <button type="submit">Filter results</button>
+    </form>
+    <hr>
     <div>Number of Todos found: {{ todos | length }}</div>
     <hr>
     {% if todos %}
