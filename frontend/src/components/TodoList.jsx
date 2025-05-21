@@ -8,12 +8,17 @@ const TodoList = () => {
     previous: null,
     results: []
   })
+  const [filter, setFilter] = useState({
+    search: '',
+    status: 'completed'
+  })
   const [error, setError] = useState('')
 
   useEffect(() => {
     const getTodos = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/v1/todos/', {
+        const response = await fetch(
+          `http://127.0.0.1:8000/api/v1/todos/?search=${filter.search}&status=${filter.status}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -27,7 +32,7 @@ const TodoList = () => {
     }
 
     getTodos()
-  }, [])
+  }, [filter])
 
   const handlePagination = async (url) => {
     try {
@@ -48,6 +53,28 @@ const TodoList = () => {
     <div>
       <h1>Todo List</h1>
       <Link to='/todos/add'>Add Todo</Link>
+      <hr />
+      <h3>Filter results</h3>
+      <div className='form-field-group'>
+        <label htmlFor='search'>Search</label>
+        <input
+          name='search'
+          value={filter.search}
+          onChange={(e) => setFilter({...filter, search: e.target.value})}
+          placeholder='Search by task name' />
+      </div>
+      <div className='form-field-group'>
+        <label htmlFor='status'>Status</label>
+        <select
+          name='status'
+          defaultValue='completed'
+          onChange={(e) => setFilter({...filter, status: e.target.value})}
+          >
+            <option value='all'>All</option>
+            <option value='completed'>Completed</option>
+            <option value='not-completed'>Not completed</option>
+        </select>
+      </div>
       <hr />
       <div>Number of Todos found: {todos.count}</div>
       <hr />
