@@ -1,48 +1,7 @@
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.http import JsonResponse
-from django.urls import reverse_lazy
+from rest_framework.viewsets import ModelViewSet
+from .serializers import TodoSeralizer
 from .models import Todo
 
-class TodoList(ListView):
-    model=Todo
-    template_name='todo/list.html'
-    context_object_name='todos'
-
-    def get_queryset(self):
-        status = self.request.GET.get('status', 'completed')
-        search = self.request.GET.get('search', '')
-
-        if status == 'all':
-            queryset = Todo.objects.all()
-        elif status == 'not_completed':
-            queryset = Todo.objects.filter(is_completed=False)
-        else:
-            queryset = Todo.objects.filter(is_completed=True)
-
-        if search:
-            queryset = queryset.filter(task_name__icontains=search)
-        return queryset
-
-    def render_to_response(self, context, **response_kwargs):
-        if self.request.GET.get('format') == 'json':
-            todos = list(self.get_queryset().values())
-            return JsonResponse(todos, safe=False)
-        return super().render_to_response(context, **response_kwargs)
-
-
-class TodoCreate(CreateView):
-    model=Todo
-    fields = ["task_name", "task_description", "is_completed"]
-    template_name='todo/form.html'
-    success_url=reverse_lazy('todo_list')
-
-class TodoUpdate(UpdateView):
-    model=Todo
-    fields = ["task_name", "task_description", "is_completed"]
-    template_name='todo/form.html'
-    success_url=reverse_lazy('todo_list')
-
-class TodoDelete(DeleteView):
-    model=Todo
-    template_name='todo/confirm_delete.html'
-    success_url=reverse_lazy('todo_list')
+class TodoViewSet(ModelViewSet):
+    queryset = Todo.objects.all()
+    serializer_class = TodoSeralizer
